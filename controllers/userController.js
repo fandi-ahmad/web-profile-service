@@ -10,7 +10,8 @@ const getAllUser = async (req, res) => {
         }
         res.json(result)
     } catch (error) {
-        console.log(error, '<-- error get user')
+        res.status(400)
+        // console.log(error, '<-- error get user')
     }
 }
 
@@ -32,7 +33,7 @@ const createUser = async (req, res) => {
         })
     } catch (error) {
         res.status(400)
-        console.log(error, '<--- error create user')
+        // console.log(error, '<--- error create user')
     }
 } 
 
@@ -64,7 +65,7 @@ const loginUser = async (req, res) => {
             status: 'failed',
             message: 'username or password is wrong'
         })
-        console.log(error, '<-- error login user')
+        // console.log(error, '<-- error login user')
     }
 }
 
@@ -84,7 +85,8 @@ const deleteUser = async (req, res) => {
             message: 'delete successfully'
         })
     } catch (error) {
-        console.log(error, 'error delete user');
+        res.status(400)
+        // console.log(error, 'error delete user');
     }
 }
 
@@ -110,42 +112,10 @@ const updateUser = async (req, res) => {
         }
 
     } catch (error) {
-        console.log(error, 'error update user');
+        res.status(400)
+        // console.log(error, 'error update user');
     }
 }
 
-// example
-const updateStudent = async (req, res) => {
-    try {
-        const { id } = req.params
-        const { name, theClass } = req.body
-        const student = await Student.findByPk(id)
-
-        if (!student) {
-            return res.status(404).json({
-                status: 'failed',
-                message: 'data is not found'
-            })
-        }
-
-        student.name = name
-        student.class = theClass
-        student.save()      // save data to db
-
-        res.json({
-            status: 'ok',
-            data: {
-                id: student.id,
-                name: student.name,
-                class: student.class,
-                createdAt: student.createdAt,
-                updatedAt: student.updatedAt
-            }
-        })
-        
-    } catch (error) {
-        console.log(error, '<-- error update student')
-    }
-}
 
 module.exports = { getAllUser, createUser, loginUser, deleteUser, updateUser }
