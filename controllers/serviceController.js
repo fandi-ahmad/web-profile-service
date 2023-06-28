@@ -90,13 +90,16 @@ const deleteService = async (req, res) => {
 const updateService = async (req, res) => {
     try {
         const { id, name, description } = req.body
-        const image = req.file.path
         const service = await Service.findByPk(id)
 
-        removeImage(service.image)
+        if (req.file) {
+            const image = req.file.path
+            removeImage(service.image)
+            service.image = image
+        }
+        
         service.name = name
         service.description = description
-        service.image = image
         service.save()
 
         res.json({
@@ -105,7 +108,7 @@ const updateService = async (req, res) => {
         })
     } catch (error) {
         res.status(400)
-        // console.log(error, '<--- error update service')
+        console.log(error, '<--- error update service')
     }
 }
 
