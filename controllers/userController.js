@@ -3,15 +3,25 @@ const { sign } = require('jsonwebtoken')
 
 const getAllUser = async (req, res) => {
     try {
-        const data = await Users.findAll()
+        const currentPage = parseInt(req.query.page) || 1
+        const limit = parseInt(req.query.limit) || 5
+
+        const { count, rows } = await Users.findAndCountAll({
+            offset: (currentPage - 1) * limit,
+            limit: limit
+        });
+
         const result = {
             status: 'ok',
-            data: data
+            data: rows,
+            page: currentPage,
+            limit: limit,
+            total_page: Math.ceil(count/limit),
+            total_data: count,
         }
         res.json(result)
     } catch (error) {
-        res.status(400)
-        // console.log(error, '<-- error get user')
+        res.status(400).json({ status: 'error', message: 'bad request' })
     }
 }
 
