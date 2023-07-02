@@ -1,4 +1,4 @@
-const { Users } = require('../models')
+const { Users, sequelize } = require('../models')
 const { sign } = require('jsonwebtoken')
 
 const getAllUser = async (req, res) => {
@@ -100,6 +100,33 @@ const deleteUser = async (req, res) => {
     }
 }
 
+const deleteMultiUser = async (req, res) => {
+    try {
+        const {id_user} = req.body
+        const user = await sequelize.query(`DELETE FROM users WHERE id IN(${id_user})`)
+
+        console.log(id_user, '<-- isi dari id_user')
+        console.log(user[0].affectedRows, 'jumlah user yang dihapus')
+
+        if (user[0].affectedRows == 0) {
+            return res.status(404).json({
+                status: 'failed',
+                message: 'user is not found'
+            })
+        } else {
+            return res.json({
+                status: 'ok',
+                message: 'delete successfully'
+            })
+
+        }
+
+    } catch (error) {
+        res.status(400)
+        console.log(error, 'error delete user');
+    }
+}
+
 const updateUser = async (req, res) => {
     try {
         const { id, username, old_password, new_password } = req.body
@@ -128,4 +155,4 @@ const updateUser = async (req, res) => {
 }
 
 
-module.exports = { getAllUser, createUser, loginUser, deleteUser, updateUser }
+module.exports = { getAllUser, createUser, loginUser, deleteUser, updateUser, deleteMultiUser }
