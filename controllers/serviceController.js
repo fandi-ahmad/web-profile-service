@@ -1,18 +1,30 @@
-const { Service } = require('../models')
+const { Service, sequelize } = require('../models')
 const path = require('path')
 const fs = require('fs')
 
+const responseApi = (res, dataRes) => {
+    const result = {
+        status: 'ok',
+        data: dataRes
+    }
+    res.json(result)
+}
+
 const getAllService = async (req, res) => {
     try {
-        const data = await Service.findAll()
-        const result = {
-            status: 'ok',
-            data: data
+        const search = req.query.search
+        const order_by = req.query.order_by // asc | desc
+
+        if (search || order_by) {
+            const data = await sequelize.query(`SELECT * FROM services WHERE name LIKE '%${search || ''}%' ORDER BY createdAt ${order_by || 'ASC'}`)
+            responseApi(res, data[0])
+        } else {
+            const data = await Service.findAll()
+            responseApi(res, data)
         }
-        res.json(result)
+
     } catch (error) {
         res.status(400)
-        // console.log(error, '<-- error get service')
     }
 }
 
@@ -20,11 +32,7 @@ const getServiceById = async (req, res) => {
     try {
         const { id } = req.params
         const service = await Service.findByPk(id)
-        const result = {
-            status: 'ok',
-            data: service
-        }
-        res.json(result)
+        responseApi(res, service)
     } catch (error) {
         res.status(400)
         // console.log(error, '<-- error get service by id')
@@ -108,7 +116,7 @@ const updateService = async (req, res) => {
         })
     } catch (error) {
         res.status(400)
-        console.log(error, '<--- error update service')
+        // console.log(error, '<--- error update service')
     }
 }
 
